@@ -24,16 +24,25 @@ const nextConfig: NextConfig = {
       },
     ],
     qualities: [100],
-    remotePatterns: [
-      ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
-        const url = new URL(item)
 
-        return {
-          hostname: url.hostname,
-          protocol: url.protocol.replace(':', '') as 'http' | 'https',
-        }
-      }),
+    //** Para deploy en vps activar este 👇**//
+    remotePatterns: [
+      {
+        hostname: process.env.NEXT_PUBLIC_SERVER_URL.split('https://')[1],
+        protocol: 'https',
+      },
     ],
+    //**🔥 Para local activar este **//
+    // remotePatterns: [
+    //   ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
+    //     const url = new URL(item)
+
+    //     return {
+    //       hostname: url.hostname,
+    //       protocol: url.protocol.replace(':', '') as 'http' | 'https',
+    //     }
+    //   }),
+    // ],
   },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
