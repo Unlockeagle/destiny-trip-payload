@@ -7,6 +7,8 @@ export const InitTheme: React.FC = () => {
   return (
     // eslint-disable-next-line @next/next/no-before-interactive-script-outside-document
     <Script
+      id="theme-script"
+      strategy="beforeInteractive"
       dangerouslySetInnerHTML={{
         __html: `
   (function () {
@@ -43,8 +45,6 @@ export const InitTheme: React.FC = () => {
   })();
   `,
       }}
-      id="theme-script"
-      strategy="beforeInteractive"
     />
   )
 }
