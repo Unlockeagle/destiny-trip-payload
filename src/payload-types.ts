@@ -278,7 +278,7 @@ export interface Post {
  */
 export interface Media {
   id: string;
-  alt?: string | null;
+  alt: string;
   caption?: {
     root: {
       type: string;
@@ -784,59 +784,93 @@ export interface Form {
   createdAt: string;
 }
 /**
- * Detalle de tus servicios
+ * Services details
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "services".
  */
 export interface Service {
   id: string;
-  tipo: 'seguro' | 'transporte' | 'boletos_aereos';
   /**
-   * Indica un titulo atractivo para tu servicio
+   * Enter an attractive title
    */
-  titulo: string;
+  title: string;
   /**
-   * Describe brevemente tu servicio
+   * Briefly describe your service
    */
-  descripcion?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  description?: string | null;
   /**
-   * Agrega características principales de tu servicios
+   * Agrega características principales de tu servicio
    */
-  beneficios?:
+  benefits?:
     | {
         item?: string | null;
         id?: string | null;
       }[]
     | null;
   /**
-   * Si tu servicio se puede comprar por separado, puedes agregar un precio
-   */
-  precioDesde?: number | null;
-  /**
    * Agrega una imagen
    */
-  imagen?: (string | null) | Media;
+  image?: (string | null) | Media;
   /**
-   * Sirve para el SEO
+   * ℹ️ This content will be used for this service's page; it is essential for SEO.
    */
+  'page-content'?: {
+    /**
+     * Create a detailed description of at least 300 words.
+     */
+    'long-description'?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    /**
+     * Preguntas frecuentes (schema FAQPage)
+     */
+    faqs?:
+      | {
+          question: string;
+          answer: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * ℹ️ Use this to provide pricing information for services.
+   */
+  offer?: {
+    /**
+     * Si tu servicio se puede comprar por separado, puedes agregar un precio
+     */
+    priceFrom?: number | null;
+    /**
+     * Select your currency
+     */
+    currency?: ('EUR' | 'USD' | 'VES') | null;
+  };
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  publishedAt?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
   slug: string;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1422,20 +1456,45 @@ export interface UsersSelect<T extends boolean = true> {
  * via the `definition` "services_select".
  */
 export interface ServicesSelect<T extends boolean = true> {
-  tipo?: T;
-  titulo?: T;
-  descripcion?: T;
-  beneficios?:
+  title?: T;
+  description?: T;
+  benefits?:
     | T
     | {
         item?: T;
         id?: T;
       };
-  precioDesde?: T;
-  imagen?: T;
+  image?: T;
+  'page-content'?:
+    | T
+    | {
+        'long-description'?: T;
+        faqs?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              id?: T;
+            };
+      };
+  offer?:
+    | T
+    | {
+        priceFrom?: T;
+        currency?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  publishedAt?: T;
+  generateSlug?: T;
   slug?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

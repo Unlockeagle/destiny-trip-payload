@@ -1,67 +1,195 @@
-import type { CollectionConfig } from 'payload'
+import { anyone } from '@/access/anyone'
+import { authenticated } from '@/access/authenticated'
+import { slugField, type CollectionConfig } from 'payload'
+import {
+  FixedToolbarFeature,
+  HeadingFeature,
+  InlineToolbarFeature,
+  lexicalEditor,
+  ParagraphFeature,
+} from '@payloadcms/richtext-lexical'
 
-// Una sola colección genérica para Seguro de viaje, Transporte y Boletos aéreos.
-// Los tres comparten la misma forma (título, beneficios, precio desde) y en la
-// práctica funcionan como páginas de servicio con botón de cotizar, no como
-// catálogos con muchos ítems distintos entre sí. Si en el futuro alguno de
-// estos crece con campos muy propios (ej. boletos aéreos con buscador de vuelos
-// en tiempo real vía API), sepáralo en su propia colección en ese momento.
 export const Services: CollectionConfig = {
   slug: 'services',
-  admin: { useAsTitle: 'titulo', description: 'Detalle de tus servicios', group: 'Products' },
-  access: { read: () => true },
+  labels: {
+    singular: {
+      en: 'Service',
+      es: 'Servicio',
+    },
+    plural: {
+      en: 'Services',
+      es: 'Servicios',
+    },
+  },
+  versions: {
+    drafts: true,
+  },
+  admin: {
+    useAsTitle: 'title',
+    description: { en: 'Services details', es: 'Detalle de tus servicios' },
+    group: 'Products',
+  },
+  defaultSort: ['title'], // This will sort title of posts by Ascending
+  access: {
+    create: authenticated,
+    delete: authenticated,
+    read: anyone,
+    update: authenticated,
+  },
   fields: [
     {
-      name: 'tipo',
-      type: 'select',
-      required: true,
-      options: [
-        { label: 'Seguro de viaje', value: 'seguro' },
-        { label: 'Transporte', value: 'transporte' },
-        { label: 'Boletos aéreos', value: 'boletos_aereos' },
+      type: 'tabs',
+      tabs: [
+        {
+          label: {
+            en: 'Content',
+            es: 'Contenido',
+          },
+          fields: [
+            {
+              name: 'title',
+              type: 'text',
+              required: true,
+              admin: {
+                description: {
+                  en: 'Enter an attractive title',
+                  es: 'Indica un título atractivo',
+                },
+              },
+            },
+            {
+              name: 'description',
+              type: 'text',
+
+              admin: {
+                description: {
+                  en: 'Briefly describe your service',
+                  es: 'Describe brevemente tu servicio',
+                },
+              },
+            },
+
+            {
+              name: 'benefits',
+              type: 'array',
+              admin: {
+                description: 'Agrega características principales de tu servicio',
+              },
+              fields: [
+                {
+                  name: 'item',
+                  type: 'text',
+                },
+              ],
+            },
+            {
+              name: 'image',
+              type: 'upload',
+              relationTo: 'media',
+              admin: {
+                description: 'Agrega una imagen',
+              },
+            },
+          ],
+        },
+        {
+          name: 'page-content',
+          label: { en: 'Page Content', es: 'Contenido de pagina' },
+          admin: {
+            description: {
+              en: "ℹ️ This content will be used for this service's page; it is essential for SEO.",
+              es: 'ℹ️ Este contenido sera utilizado para la pagina de este servicio, esencial para el SEO.',
+            },
+          },
+          fields: [
+            {
+              name: 'long-description',
+              type: 'richText',
+              editor: lexicalEditor({
+                features: ({ rootFeatures }) => [
+                  ...rootFeatures,
+                  HeadingFeature(),
+                  FixedToolbarFeature(),
+                  InlineToolbarFeature(),
+                  ParagraphFeature(),
+                ],
+              }),
+              admin: {
+                description: {
+                  en: 'Create a detailed description of at least 300 words.',
+                  es: 'Crea una descripción detallada no menos de 300 palabras',
+                },
+              },
+            },
+            {
+              name: 'faqs',
+              type: 'array',
+              admin: { description: 'Preguntas frecuentes (schema FAQPage)' },
+              fields: [
+                { name: 'question', type: 'text', required: true },
+                { name: 'answer', type: 'textarea', required: true },
+              ],
+            },
+          ],
+        },
+        {
+          name: 'offer',
+          label: { en: 'Price', es: 'Precios' },
+          admin: {
+            description: {
+              en: 'ℹ️ Use this to provide pricing information for services.',
+              es: 'ℹ️ Usar en caso de querer informar los precios de los servicios.',
+            },
+          },
+          fields: [
+            {
+              name: 'priceFrom',
+              type: 'number',
+              admin: {
+                description:
+                  'Si tu servicio se puede comprar por separado, puedes agregar un precio',
+              },
+            },
+            {
+              name: 'currency',
+              type: 'select',
+              defaultValue: 'EUR',
+              options: ['EUR', 'USD', 'VES'],
+              admin: {
+                description: { en: 'Select your currency', es: 'Selecciona la moneda' },
+              },
+            },
+          ],
+        },
       ],
-      admin: { position: 'sidebar' },
     },
+
     {
-      name: 'titulo',
-      type: 'text',
-      required: true,
+      name: 'publishedAt',
+      type: 'date',
+      defaultValue: () => new Date(),
       admin: {
-        description: 'Indica un titulo atractivo para tu servicio',
+        date: {
+          pickerAppearance: 'dayAndTime',
+        },
+        position: 'sidebar',
+      },
+
+      hooks: {
+        beforeChange: [
+          ({ siblingData, value }) => {
+            if (siblingData._status === 'published' && !value) {
+              return new Date()
+            }
+
+            return value
+          },
+        ],
       },
     },
-    {
-      name: 'descripcion',
-      type: 'richText',
-      admin: {
-        description: 'Describe brevemente tu servicio',
-      },
-    },
-    {
-      name: 'beneficios',
-      type: 'array',
-      fields: [{ name: 'item', type: 'text' }],
-      admin: { description: 'Agrega características principales de tu servicios' },
-    },
-    {
-      name: 'precioDesde',
-      type: 'number',
-      admin: {
-        description: 'Si tu servicio se puede comprar por separado, puedes agregar un precio',
-      },
-    },
-    {
-      name: 'imagen',
-      type: 'upload',
-      relationTo: 'media',
-      admin: { description: 'Agrega una imagen' },
-    },
-    {
-      name: 'slug',
-      type: 'text',
-      required: true,
-      unique: true,
-      admin: { description: 'Sirve para el SEO' },
-    },
+
+    slugField({
+      position: 'sidebar',
+    }),
   ],
 }

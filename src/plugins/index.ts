@@ -5,7 +5,7 @@ import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
 import { Plugin } from 'payload'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
-import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
+import { GenerateDescription, GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { searchFields } from '@/search/fieldOverrides'
 import { beforeSyncWithSearch } from '@/search/beforeSync'
@@ -13,14 +13,69 @@ import { beforeSyncWithSearch } from '@/search/beforeSync'
 import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 
-const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | Payload Website Template` : 'Payload Website Template'
+const generateTitle: GenerateTitle = ({ doc, collectionConfig }) => {
+  switch (collectionConfig?.slug) {
+    case 'flights':
+      // ✅ lee los campos reales, no el virtual
+      return doc?.origin && doc?.destination
+        ? `Vuelo ${doc.origin} → ${doc.destination} | Destiny Trip`
+        : 'Destiny Trip'
+
+    case 'posts':
+      return doc?.title ? `${doc.title} | Blog Destiny Trip` : 'Blog | Destiny Trip'
+
+    case 'travel-packages':
+      return doc?.title ? `${doc.title} | Paquetes Destiny Trip` : 'Paquete | Destiny Trip'
+    case 'services':
+      return doc?.title ? `${doc.title} | Service Destiny Trip` : 'Paquete | Destiny Trip'
+
+    default:
+      return 'Destiny Trip'
+  }
 }
 
-const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
-  const url = getServerSideURL()
+const generateDescription: GenerateDescription = ({ doc, collectionConfig }) => {
+  switch (collectionConfig?.slug) {
+    case 'flights':
+      return doc?.description ?? ''
 
-  return doc?.slug ? `${url}/${doc.slug}` : url
+    case 'posts':
+      return doc?.excerpt ?? ''
+
+    case 'travel-packages':
+      return doc?.description ?? ''
+
+    case 'services':
+      return doc?.description ?? ''
+
+    default:
+      return ''
+  }
+}
+
+const generateURL: GenerateURL = ({ doc, collectionConfig }) => {
+  const base = getServerSideURL()
+
+  if (!doc?.slug) return base
+
+  switch (collectionConfig?.slug) {
+    case 'flights':
+      // typeFlight puede ser un objeto populated o un string
+      const type = doc?.typeFlight?.slug ?? 'internacionales'
+      return doc?.slug ? `${base}/vuelos/${type}/${doc.slug}` : base
+
+    case 'posts':
+      return doc?.slug ? `${base}/blog/${doc.slug}` : base
+
+    case 'travel-packages':
+      return doc?.slug ? `${base}/paquete/${doc.slug}` : base
+
+    case 'services':
+      return doc?.slug ? `${base}/service/${doc.slug}` : base
+
+    default:
+      return base
+  }
 }
 
 export const plugins: Plugin[] = [
@@ -52,7 +107,10 @@ export const plugins: Plugin[] = [
   }),
   seoPlugin({
     generateTitle,
+    generateDescription,
     generateURL,
+    collections: ['services'],
+    tabbedUI: true, // 👈 esto le dice al plugin que integre el meta group como un tab dentro de tu array de tabs existente
   }),
   formBuilderPlugin({
     fields: {
@@ -69,7 +127,7 @@ export const plugins: Plugin[] = [
                   return [
                     ...rootFeatures,
                     FixedToolbarFeature(),
-                    HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
+                    HeadingFeature({ enabledHeadingSizes: ['h2', 'h3', 'h4', 'h5'] }),
                   ]
                 },
               }),

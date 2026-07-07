@@ -27,7 +27,7 @@ export const Media: CollectionConfig = {
     {
       name: 'alt',
       type: 'text',
-      //required: true,
+      required: true,
     },
     {
       name: 'caption',
@@ -42,8 +42,12 @@ export const Media: CollectionConfig = {
   upload: {
     // Upload to the public/media directory in Next.js making them publicly accessible even outside of Payload
     staticDir: path.resolve(dirname, '../../public/media'),
-    adminThumbnail: 'thumbnail',
+    adminThumbnail: 'thumbnail', // para mostrar miniatura en la app
     focalPoint: true,
+    formatOptions: {
+      format: 'webp',
+    },
+    mimeTypes: ['image/png', 'image/webp', 'image/jpg'],
     imageSizes: [
       {
         name: 'thumbnail',
