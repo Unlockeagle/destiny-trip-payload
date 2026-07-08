@@ -27,7 +27,7 @@ export const Services: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     description: { en: 'Services details', es: 'Detalle de tus servicios' },
-    group: 'Products',
+    group: 'Catalog',
   },
   defaultSort: ['title'], // This will sort title of posts by Ascending
   access: {
@@ -60,7 +60,7 @@ export const Services: CollectionConfig = {
             {
               name: 'description',
               type: 'text',
-
+              required: true,
               admin: {
                 description: {
                   en: 'Briefly describe your service',
@@ -87,7 +87,7 @@ export const Services: CollectionConfig = {
               type: 'upload',
               relationTo: 'media',
               admin: {
-                description: 'Agrega una imagen',
+                description: { en: 'Add a image', es: 'Agrega una imagen' },
               },
             },
           ],
@@ -105,6 +105,8 @@ export const Services: CollectionConfig = {
             {
               name: 'long-description',
               type: 'richText',
+              required: true,
+              localized: true,
               editor: lexicalEditor({
                 features: ({ rootFeatures }) => [
                   ...rootFeatures,

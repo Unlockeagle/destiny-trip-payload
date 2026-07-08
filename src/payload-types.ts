@@ -73,6 +73,7 @@ export interface Config {
     categories: Category;
     users: User;
     services: Service;
+    destinations: Destination;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -96,6 +97,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
+    destinations: DestinationsSelect<false> | DestinationsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -798,7 +800,7 @@ export interface Service {
   /**
    * Briefly describe your service
    */
-  description?: string | null;
+  description: string;
   /**
    * Agrega características principales de tu servicio
    */
@@ -809,17 +811,17 @@ export interface Service {
       }[]
     | null;
   /**
-   * Agrega una imagen
+   * Add a image
    */
   image?: (string | null) | Media;
   /**
    * ℹ️ This content will be used for this service's page; it is essential for SEO.
    */
-  'page-content'?: {
+  'page-content': {
     /**
      * Create a detailed description of at least 300 words.
      */
-    'long-description'?: {
+    'long-description': {
       root: {
         type: string;
         children: {
@@ -833,7 +835,7 @@ export interface Service {
         version: number;
       };
       [k: string]: unknown;
-    } | null;
+    };
     /**
      * Preguntas frecuentes (schema FAQPage)
      */
@@ -861,6 +863,10 @@ export interface Service {
   meta?: {
     title?: string | null;
     description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
   };
   publishedAt?: string | null;
   /**
@@ -868,6 +874,80 @@ export interface Service {
    */
   generateSlug?: boolean | null;
   slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Destinations supported by your agency
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "destinations".
+ */
+export interface Destination {
+  id: string;
+  title: string;
+  /**
+   * Used in listing cards and search results snippets
+   */
+  description?: string | null;
+  country: string;
+  /**
+   * Reference "from" price for listing cards only. Real pricing lives in Packages/Cruises.
+   */
+  priceFrom?: number | null;
+  mainImage?: (string | null) | Media;
+  gallery?: (string | Media)[] | null;
+  /**
+   * Create a detailed description of at least 300 words.
+   */
+  'long-description': {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Powers an FAQPage schema block for rich snippets in Google
+   */
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+  };
+  publishedAt?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * Auto-computed from country
+   */
+  type: 'national' | 'international';
+  /**
+   * Enable to include in highlights
+   */
+  featured?: boolean | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1085,6 +1165,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'services';
         value: string | Service;
+      } | null)
+    | ({
+        relationTo: 'destinations';
+        value: string | Destination;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1488,10 +1572,46 @@ export interface ServicesSelect<T extends boolean = true> {
     | {
         title?: T;
         description?: T;
+        image?: T;
       };
   publishedAt?: T;
   generateSlug?: T;
   slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "destinations_select".
+ */
+export interface DestinationsSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  country?: T;
+  priceFrom?: T;
+  mainImage?: T;
+  gallery?: T;
+  'long-description'?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  publishedAt?: T;
+  generateSlug?: T;
+  slug?: T;
+  type?: T;
+  featured?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

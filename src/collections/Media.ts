@@ -75,7 +75,7 @@ export const Media: CollectionConfig = {
         width: 1920,
       },
       {
-        name: 'og',
+        name: 'og', // 👈 tamaño específico para redes sociales/SEO
         width: 1200,
         height: 630,
         crop: 'center',

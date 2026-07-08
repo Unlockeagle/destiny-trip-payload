@@ -28,6 +28,8 @@ const generateTitle: GenerateTitle = ({ doc, collectionConfig }) => {
       return doc?.title ? `${doc.title} | Paquetes Destiny Trip` : 'Paquete | Destiny Trip'
     case 'services':
       return doc?.title ? `${doc.title} | Service Destiny Trip` : 'Paquete | Destiny Trip'
+    case 'destinations':
+      return doc?.title ? `${doc.title} | Destinations Destiny Trip` : 'Paquete | Destiny Trip'
 
     default:
       return 'Destiny Trip'
@@ -46,6 +48,8 @@ const generateDescription: GenerateDescription = ({ doc, collectionConfig }) => 
       return doc?.description ?? ''
 
     case 'services':
+      return doc?.description ?? ''
+    case 'destinations':
       return doc?.description ?? ''
 
     default:
@@ -72,6 +76,8 @@ const generateURL: GenerateURL = ({ doc, collectionConfig }) => {
 
     case 'services':
       return doc?.slug ? `${base}/service/${doc.slug}` : base
+    case 'destinations':
+      return doc?.slug ? `${base}/destinations/${doc.slug}` : base
 
     default:
       return base
@@ -109,8 +115,22 @@ export const plugins: Plugin[] = [
     generateTitle,
     generateDescription,
     generateURL,
-    collections: ['services'],
+    collections: ['services', 'destinations'],
+    uploadsCollection: 'media', // 👈 el slug real de tu colección con upload habilitado
     tabbedUI: true, // 👈 esto le dice al plugin que integre el meta group como un tab dentro de tu array de tabs existente
+    fields: ({ defaultFields }) => [
+      ...defaultFields,
+      // Componente UI para preview de SEO de redes sociales
+      {
+        name: 'richPreview',
+        type: 'ui',
+        admin: {
+          components: {
+            Field: '@/components/RichPreview#RichPreview', // 👈 string, no import
+          },
+        },
+      },
+    ],
   }),
   formBuilderPlugin({
     fields: {
