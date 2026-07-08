@@ -118,19 +118,19 @@ export const plugins: Plugin[] = [
     collections: ['services', 'destinations'],
     uploadsCollection: 'media', // 👈 el slug real de tu colección con upload habilitado
     tabbedUI: true, // 👈 esto le dice al plugin que integre el meta group como un tab dentro de tu array de tabs existente
-    // fields: ({ defaultFields }) => [
-    //   ...defaultFields,
-    //   // Componente UI para preview de SEO de redes sociales
-    //   {
-    //     name: 'richPreview',
-    //     type: 'ui',
-    //     admin: {
-    //       components: {
-    //         Field: '@/components/RichPreview#RichPreview', // 👈 string, no import
-    //       },
-    //     },
-    //   },
-    // ],
+    fields: ({ defaultFields }) => [
+      ...defaultFields,
+      // Componente UI para preview de SEO de redes sociales
+      {
+        name: 'richPreview',
+        type: 'ui',
+        admin: {
+          components: {
+            Field: '@/components/RichPreview#RichPreview', // 👈 string, no import
+          },
+        },
+      },
+    ],
   }),
   formBuilderPlugin({
     fields: {
