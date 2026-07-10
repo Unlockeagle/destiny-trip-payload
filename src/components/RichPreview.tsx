@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, type CSSProperties } from 'react'
 import { useFormFields, useConfig } from '@payloadcms/ui'
 
 /**
@@ -12,6 +12,10 @@ import { useFormFields, useConfig } from '@payloadcms/ui'
  * Se registra como un campo tipo "ui" dentro del grupo `meta` que crea el plugin de SEO.
  * Lee los valores hermanos (meta.title, meta.description, meta.image) en tiempo real
  * usando useFormFields, así que se actualiza mientras el editor escribe.
+ *
+ * Estilos 100% inline (sin Tailwind) para no depender del pipeline de CSS del admin.
+ * Los colores usan las CSS vars nativas de Payload, así que respetan el tema claro/oscuro
+ * del panel automáticamente.
  */
 
 type MediaDoc = {
@@ -19,6 +23,109 @@ type MediaDoc = {
   url?: string
   filename?: string
   alt?: string
+}
+
+const styles: Record<string, CSSProperties> = {
+  wrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '24px',
+    maxWidth: '560px',
+  },
+  sectionLabel: {
+    fontSize: '11px',
+    fontWeight: 600,
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    color: 'var(--theme-elevation-500)',
+    marginBottom: '8px',
+  },
+  serpCard: {
+    borderRadius: '8px',
+    border: '1px solid var(--theme-elevation-150)',
+    backgroundColor: 'var(--theme-elevation-0)',
+    padding: '16px',
+  },
+  serpUrl: {
+    fontSize: '13px',
+    color: 'var(--theme-elevation-500)',
+    margin: 0,
+  },
+  serpTitle: {
+    fontSize: '18px',
+    color: '#1a0dab',
+    margin: '4px 0 0',
+    fontWeight: 400,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  serpDescription: {
+    fontSize: '14px',
+    color: 'var(--theme-elevation-700)',
+    margin: '4px 0 0',
+    lineHeight: 1.5,
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden',
+  },
+  socialCard: {
+    borderRadius: '12px',
+    border: '1px solid var(--theme-elevation-150)',
+    overflow: 'hidden',
+    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+  },
+  imageWrapper: {
+    position: 'relative',
+    width: '100%',
+    paddingBottom: '52.36%', // ~1.91:1, estándar de OG image (1200x630)
+    backgroundColor: 'var(--theme-elevation-100)',
+  },
+  imageInner: {
+    position: 'absolute',
+    inset: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+  },
+  placeholderText: {
+    fontSize: '13px',
+    color: 'var(--theme-elevation-400)',
+  },
+  socialBody: {
+    borderTop: '1px solid var(--theme-elevation-150)',
+    backgroundColor: 'var(--theme-elevation-0)',
+    padding: '16px',
+  },
+  socialHostname: {
+    fontSize: '11px',
+    textTransform: 'uppercase',
+    letterSpacing: '0.03em',
+    color: 'var(--theme-elevation-500)',
+    margin: 0,
+  },
+  socialTitle: {
+    fontSize: '16px',
+    fontWeight: 600,
+    color: 'var(--theme-elevation-800)',
+    margin: '4px 0 0',
+  },
+  socialDescription: {
+    fontSize: '14px',
+    lineHeight: 1.5,
+    color: 'var(--theme-elevation-600)',
+    margin: '4px 0 0',
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden',
+  },
 }
 
 export const RichPreview: React.FC = () => {
@@ -35,6 +142,8 @@ export const RichPreview: React.FC = () => {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
+    let cancelled = false
+
     if (!imageValue) {
       setImageDoc(null)
       return
@@ -55,13 +164,18 @@ export const RichPreview: React.FC = () => {
 
         if (!response.ok) return
 
-        setImageDoc(await response.json())
+        const data = await response.json()
+        if (!cancelled) setImageDoc(data)
       } finally {
-        setLoading(false)
+        if (!cancelled) setLoading(false)
       }
     }
 
     loadMedia()
+
+    return () => {
+      cancelled = true
+    }
   }, [imageValue, serverURL])
 
   const imageURL = imageDoc?.url
@@ -74,43 +188,48 @@ export const RichPreview: React.FC = () => {
   const displayDescription =
     description || 'La descripción meta aparecerá aquí a medida que la escribas.'
 
-  return (
-    <div className="max-w-xl space-y-8 bg-red-600">
-      {/* Social Preview */}
-      <section className="space-y-2 border border-slate-700 bg-red-800">
-        <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-          Vista previa en WhatsApp / Facebook / LinkedIn
-        </p>
+  const hostname = (() => {
+    try {
+      return new URL(serverURL || 'https://tusitio.com').hostname
+    } catch {
+      return 'tusitio.com'
+    }
+  })()
 
-        <div className="overflow-hidden rounded-xl border shadow-sm">
-          <div className="h-32 w-32 bg-red-500">
-            {loading ? (
-              <div className="flex items-center justify-center text-sm text-zinc-500">
-                Cargando imagen...
-              </div>
-            ) : imageURL ? (
-              <img
-                src={imageURL}
-                alt={imageDoc?.alt ?? ''}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex bg-ref-500 items-center justify-center text-sm text-slate-100">
-                Sin imagen seleccionada
-              </div>
-            )}
+  return (
+    <div style={styles.wrapper}>
+      {/* Google SERP Preview */}
+      <section>
+        <p style={styles.sectionLabel}>Vista previa en Google</p>
+
+        <div style={styles.serpCard}>
+          <p style={styles.serpUrl}>{hostname} › ...</p>
+          <h3 style={styles.serpTitle}>{displayTitle}</h3>
+          <p style={styles.serpDescription}>{displayDescription}</p>
+        </div>
+      </section>
+
+      {/* Social Card Preview */}
+      <section>
+        <p style={styles.sectionLabel}>Vista previa en WhatsApp / Facebook / LinkedIn</p>
+
+        <div style={styles.socialCard}>
+          <div style={styles.imageWrapper}>
+            <div style={styles.imageInner}>
+              {loading ? (
+                <span style={styles.placeholderText}>Cargando imagen...</span>
+              ) : imageURL ? (
+                <img src={imageURL} alt={imageDoc?.alt ?? ''} style={styles.image} />
+              ) : (
+                <span style={styles.placeholderText}>Sin imagen seleccionada</span>
+              )}
+            </div>
           </div>
 
-          <div className="border-t border-zinc-200 p-4">
-            <p className="text-[11px] uppercase tracking-wide text-zinc-500">
-              {new URL(serverURL || 'https://tusitio.com').hostname.toUpperCase()}
-            </p>
-
-            <h3 className="mt-1 text-base font-semibold text-zinc-900">{displayTitle}</h3>
-
-            <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-zinc-600">
-              {displayDescription}
-            </p>
+          <div style={styles.socialBody}>
+            <p style={styles.socialHostname}>{hostname.toUpperCase()}</p>
+            <h3 style={styles.socialTitle}>{displayTitle}</h3>
+            <p style={styles.socialDescription}>{displayDescription}</p>
           </div>
         </div>
       </section>

@@ -27,7 +27,7 @@ export const Services: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     description: { en: 'Services details', es: 'Detalle de tus servicios' },
-    group: 'Catalog',
+    group: 'Catalogo',
   },
   defaultSort: ['title'], // This will sort title of posts by Ascending
   access: {

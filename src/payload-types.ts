@@ -74,6 +74,7 @@ export interface Config {
     users: User;
     services: Service;
     destinations: Destination;
+    accommodations: Accommodation;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -98,6 +99,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
     destinations: DestinationsSelect<false> | DestinationsSelect<true>;
+    accommodations: AccommodationsSelect<false> | AccommodationsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -896,6 +898,19 @@ export interface Destination {
    * Reference "from" price for listing cards only. Real pricing lives in Packages/Cruises.
    */
   priceFrom?: number | null;
+  /**
+   * Highlights shown as icons/badges on the destination page (luggage, meals, transfers, etc.)
+   */
+  features?:
+    | {
+        icon: 'luggage' | 'meals' | 'transfers' | 'wifi' | 'insurance' | 'guide' | 'hotel' | 'flight' | 'other';
+        /**
+         * e.g. "2 checked bags 23kg" or "Breakfast included"
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
   mainImage?: (string | null) | Media;
   gallery?: (string | Media)[] | null;
   /**
@@ -945,9 +960,69 @@ export interface Destination {
    */
   type: 'national' | 'international';
   /**
-   * Enable to include in highlights
+   * Destiny Is Activate?
    */
   featured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * A collection of hotels available for you to manage, organize, and offer the best accommodation options to your clients via the Destiny Trip administrative panel.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "accommodations".
+ */
+export interface Accommodation {
+  id: string;
+  title: string;
+  address?: string | null;
+  country?: string | null;
+  state?: string | null;
+  /**
+   * Add phone, emails, social media or any contact details
+   */
+  info?:
+    | {
+        type:
+          | 'phone'
+          | 'whatsapp'
+          | 'email'
+          | 'contact'
+          | 'zip'
+          | 'website'
+          | 'facebook'
+          | 'instagram'
+          | 'linkedin'
+          | 'tiktok';
+        /**
+         * Ej: Oficina Principal, Soporte, Ventas.
+         */
+        label?: string | null;
+        /**
+         * Ej: +58 412 123 4567
+         */
+        value: string;
+        isPublic?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  cover_image?: (string | null) | Media;
+  gallery_images?: (string | Media)[] | null;
+  /**
+   * Precio alojamiento por persona en $
+   */
+  price?: number | null;
+  /**
+   * Fecha final del precio
+   */
+  'expiration-date'?: string | null;
+  publishedAt?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1169,6 +1244,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'destinations';
         value: string | Destination;
+      } | null)
+    | ({
+        relationTo: 'accommodations';
+        value: string | Accommodation;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1590,6 +1669,13 @@ export interface DestinationsSelect<T extends boolean = true> {
   description?: T;
   country?: T;
   priceFrom?: T;
+  features?:
+    | T
+    | {
+        icon?: T;
+        label?: T;
+        id?: T;
+      };
   mainImage?: T;
   gallery?: T;
   'long-description'?: T;
@@ -1612,6 +1698,35 @@ export interface DestinationsSelect<T extends boolean = true> {
   slug?: T;
   type?: T;
   featured?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "accommodations_select".
+ */
+export interface AccommodationsSelect<T extends boolean = true> {
+  title?: T;
+  address?: T;
+  country?: T;
+  state?: T;
+  info?:
+    | T
+    | {
+        type?: T;
+        label?: T;
+        value?: T;
+        isPublic?: T;
+        id?: T;
+      };
+  cover_image?: T;
+  gallery_images?: T;
+  price?: T;
+  'expiration-date'?: T;
+  publishedAt?: T;
+  generateSlug?: T;
+  slug?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

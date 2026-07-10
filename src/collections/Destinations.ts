@@ -1,8 +1,7 @@
 import { anyone } from '@/access/anyone'
 import { authenticated } from '@/access/authenticated'
 import { slugField, type CollectionConfig } from 'payload'
-import { SeoFields } from './SeoField'
-import { fields } from '../blocks/Form/fields'
+
 import {
   FixedToolbarFeature,
   HeadingFeature,
@@ -26,7 +25,7 @@ export const Destinations: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'country', 'type', 'featured'],
-    group: 'Catalog',
+    group: 'Catalogo',
     description: {
       en: 'Destinations supported by your agency',
       es: 'Destinos soportados por tu agencia',
@@ -100,6 +99,54 @@ export const Destinations: CollectionConfig = {
                   es: 'Precio referencial "desde" solo para tarjetas de listado. El precio real vive en Packages/Cruises.',
                 },
               },
+            },
+            {
+              name: 'features',
+              type: 'array',
+              localized: true, // el label/detalle sí se traduce; el "icon" no debería
+              label: { en: 'Included features', es: 'Características incluidas' },
+              labels: {
+                singular: { en: 'Feature', es: 'Característica' },
+                plural: { en: 'Features', es: 'Características' },
+              },
+              admin: {
+                description: {
+                  en: 'Highlights shown as icons/badges on the destination page (luggage, meals, transfers, etc.)',
+                  es: 'Se muestran como íconos/badges en la página del destino (maletas, comidas, traslados, etc.)',
+                },
+              },
+              fields: [
+                {
+                  name: 'icon',
+                  type: 'select',
+                  required: true,
+                  label: { en: 'Icon', es: 'Ícono' },
+                  // OJO: este campo NO debería ser localized (es un valor técnico, no texto)
+                  options: [
+                    { label: { en: 'Luggage', es: 'Maletas' }, value: 'luggage' },
+                    { label: { en: 'Meals', es: 'Comidas' }, value: 'meals' },
+                    { label: { en: 'Transfers', es: 'Traslados' }, value: 'transfers' },
+                    { label: { en: 'Wifi', es: 'Wifi' }, value: 'wifi' },
+                    { label: { en: 'Insurance', es: 'Seguro de viaje' }, value: 'insurance' },
+                    { label: { en: 'Guide', es: 'Guía turístico' }, value: 'guide' },
+                    { label: { en: 'Hotel', es: 'Hotel' }, value: 'hotel' },
+                    { label: { en: 'Flight', es: 'Vuelo' }, value: 'flight' },
+                    { label: { en: 'Other', es: 'Otro' }, value: 'other' },
+                  ],
+                },
+                {
+                  name: 'label',
+                  type: 'text',
+                  required: true,
+                  label: { en: 'Label', es: 'Etiqueta' },
+                  admin: {
+                    description: {
+                      en: 'e.g. "2 checked bags 23kg" or "Breakfast included"',
+                      es: 'ej. "2 maletas de 23kg" o "Desayuno incluido"',
+                    },
+                  },
+                },
+              ],
             },
             {
               name: 'mainImage',
@@ -225,12 +272,12 @@ export const Destinations: CollectionConfig = {
       name: 'featured',
       type: 'checkbox',
       defaultValue: false,
-      label: { en: 'Featured', es: 'Destacado' },
+      label: { en: 'Activate', es: 'Activo' },
       admin: {
         position: 'sidebar',
         description: {
-          en: 'Enable to include in highlights',
-          es: 'Activar para incluir en destacados',
+          en: 'Destiny Is Activate?',
+          es: 'Destino Activo?',
         },
       },
     },
