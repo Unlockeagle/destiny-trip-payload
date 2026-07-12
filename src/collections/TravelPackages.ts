@@ -1,11 +1,14 @@
 import { anyone } from '@/access/anyone'
 import { authenticated } from '@/access/authenticated'
 import {
+  BlockquoteFeature,
   FixedToolbarFeature,
   HeadingFeature,
   InlineToolbarFeature,
   lexicalEditor,
+  LinkFeature,
   ParagraphFeature,
+  UploadFeature,
 } from '@payloadcms/richtext-lexical'
 
 import { slugField, type CollectionConfig } from 'payload'
@@ -174,64 +177,6 @@ export const TravelPackages: CollectionConfig = {
           ],
         },
         {
-          label: { en: 'Page Content', es: 'Contenido de pagina' },
-          fields: [
-            {
-              name: 'long-description',
-              type: 'richText',
-              required: true,
-              localized: true,
-              editor: lexicalEditor({
-                features: ({ rootFeatures }) => [
-                  ...rootFeatures,
-                  HeadingFeature(),
-                  FixedToolbarFeature(),
-                  InlineToolbarFeature(),
-                  ParagraphFeature(),
-                ],
-              }),
-              label: { en: 'Full description', es: 'Descripción completa' },
-              admin: {
-                description: {
-                  en: 'Create a detailed description of at least 300 words.',
-                  es: 'Crea una descripción detallada no menos de 300 palabras',
-                },
-              },
-            },
-
-            {
-              name: 'faqs',
-              type: 'array',
-              localized: true,
-              label: { en: 'FAQs', es: 'Preguntas frecuentes' },
-              labels: {
-                singular: { en: 'FAQ', es: 'Pregunta' },
-                plural: { en: 'FAQs', es: 'Preguntas' },
-              },
-              admin: {
-                description: {
-                  en: 'Powers an FAQPage schema block for rich snippets in Google',
-                  es: 'Alimenta un bloque de schema FAQPage para rich snippets en Google',
-                },
-              },
-              fields: [
-                {
-                  name: 'question',
-                  type: 'text',
-                  required: true,
-                  label: { en: 'Question', es: 'Pregunta' },
-                },
-                {
-                  name: 'answer',
-                  type: 'textarea',
-                  required: true,
-                  label: { en: 'Answer', es: 'Respuesta' },
-                },
-              ],
-            },
-          ],
-        },
-        {
           label: { en: 'Price', es: 'Precio' },
           fields: [
             {
@@ -310,6 +255,88 @@ export const TravelPackages: CollectionConfig = {
                   type: 'text',
                   required: true,
                   label: { en: 'Item', es: 'Ítem' },
+                },
+              ],
+            },
+          ],
+        },
+        {
+          label: { en: 'Page Content', es: 'Contenido de pagina' },
+          fields: [
+            {
+              name: 'long-description',
+              type: 'richText',
+              required: true,
+              localized: true,
+              editor: lexicalEditor({
+                features: ({ rootFeatures }) => [
+                  ...rootFeatures,
+                  HeadingFeature(),
+                  FixedToolbarFeature(),
+                  InlineToolbarFeature(),
+                  ParagraphFeature(),
+                  BlockquoteFeature(),
+                  LinkFeature({
+                    // esto habilita el link a documentos internos (no solo URL externa)
+                    enabledCollections: ['pages', 'posts'],
+                    fields: ({ defaultFields }) => [
+                      ...defaultFields,
+                      {
+                        name: 'rel',
+                        type: 'select',
+                        hasMany: true,
+                        options: ['nofollow', 'sponsored'],
+                      },
+                    ],
+                  }),
+                  UploadFeature({
+                    collections: {
+                      media: {
+                        fields: [
+                          { name: 'alt', type: 'text' }, // alt para SEO/accesibilidad
+                          { name: 'caption', type: 'text' },
+                        ],
+                      },
+                    },
+                  }),
+                ],
+              }),
+              label: { en: 'Full description', es: 'Descripción completa' },
+              admin: {
+                description: {
+                  en: 'Create a detailed description of at least 300 words.',
+                  es: 'Crea una descripción detallada no menos de 300 palabras',
+                },
+              },
+            },
+
+            {
+              name: 'faqs',
+              type: 'array',
+              localized: true,
+              label: { en: 'FAQs', es: 'Preguntas frecuentes' },
+              labels: {
+                singular: { en: 'FAQ', es: 'Pregunta' },
+                plural: { en: 'FAQs', es: 'Preguntas' },
+              },
+              admin: {
+                description: {
+                  en: 'Powers an FAQPage schema block for rich snippets in Google',
+                  es: 'Alimenta un bloque de schema FAQPage para rich snippets en Google',
+                },
+              },
+              fields: [
+                {
+                  name: 'question',
+                  type: 'text',
+                  required: true,
+                  label: { en: 'Question', es: 'Pregunta' },
+                },
+                {
+                  name: 'answer',
+                  type: 'textarea',
+                  required: true,
+                  label: { en: 'Answer', es: 'Respuesta' },
                 },
               ],
             },

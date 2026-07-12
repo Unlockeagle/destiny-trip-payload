@@ -3,11 +3,14 @@ import { authenticated } from '@/access/authenticated'
 import { slugField, type CollectionConfig } from 'payload'
 
 import {
+  BlockquoteFeature,
   FixedToolbarFeature,
   HeadingFeature,
   InlineToolbarFeature,
   lexicalEditor,
+  LinkFeature,
   ParagraphFeature,
+  UploadFeature,
 } from '@payloadcms/richtext-lexical'
 
 export const Destinations: CollectionConfig = {
@@ -193,6 +196,30 @@ export const Destinations: CollectionConfig = {
                   FixedToolbarFeature(),
                   InlineToolbarFeature(),
                   ParagraphFeature(),
+                  BlockquoteFeature(),
+                  LinkFeature({
+                    // esto habilita el link a documentos internos (no solo URL externa)
+                    enabledCollections: ['pages', 'posts'],
+                    fields: ({ defaultFields }) => [
+                      ...defaultFields,
+                      {
+                        name: 'rel',
+                        type: 'select',
+                        hasMany: true,
+                        options: ['nofollow', 'sponsored'],
+                      },
+                    ],
+                  }),
+                  UploadFeature({
+                    collections: {
+                      media: {
+                        fields: [
+                          { name: 'alt', type: 'text' }, // alt para SEO/accesibilidad
+                          { name: 'caption', type: 'text' },
+                        ],
+                      },
+                    },
+                  }),
                 ],
               }),
               label: { en: 'Full description', es: 'Descripción completa' },

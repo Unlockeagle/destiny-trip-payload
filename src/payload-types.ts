@@ -1085,6 +1085,23 @@ export interface TravelPackage {
     };
     [k: string]: unknown;
   } | null;
+  price: number;
+  discountPrice?: number | null;
+  currency: 'VES' | 'USD' | 'EUR';
+  nights: number;
+  days: number;
+  includes?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  excludes?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Create a detailed description of at least 300 words.
    */
@@ -1110,23 +1127,6 @@ export interface TravelPackage {
     | {
         question: string;
         answer: string;
-        id?: string | null;
-      }[]
-    | null;
-  price: number;
-  discountPrice?: number | null;
-  currency: 'VES' | 'USD' | 'EUR';
-  nights: number;
-  days: number;
-  includes?:
-    | {
-        item: string;
-        id?: string | null;
-      }[]
-    | null;
-  excludes?:
-    | {
-        item: string;
         id?: string | null;
       }[]
     | null;
@@ -1912,14 +1912,6 @@ export interface TravelPackagesSelect<T extends boolean = true> {
         id?: T;
       };
   content?: T;
-  'long-description'?: T;
-  faqs?:
-    | T
-    | {
-        question?: T;
-        answer?: T;
-        id?: T;
-      };
   price?: T;
   discountPrice?: T;
   currency?: T;
@@ -1935,6 +1927,14 @@ export interface TravelPackagesSelect<T extends boolean = true> {
     | T
     | {
         item?: T;
+        id?: T;
+      };
+  'long-description'?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
         id?: T;
       };
   meta?:
