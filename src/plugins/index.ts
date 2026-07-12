@@ -115,7 +115,7 @@ export const plugins: Plugin[] = [
     generateTitle,
     generateDescription,
     generateURL,
-    collections: ['services', 'destinations'],
+    collections: ['services', 'destinations', 'travel-packages'],
     uploadsCollection: 'media', // 👈 el slug real de tu colección con upload habilitado
     tabbedUI: true, // 👈 esto le dice al plugin que integre el meta group como un tab dentro de tu array de tabs existente
     fields: ({ defaultFields }) => [

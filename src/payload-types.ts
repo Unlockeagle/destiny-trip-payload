@@ -75,6 +75,8 @@ export interface Config {
     services: Service;
     destinations: Destination;
     accommodations: Accommodation;
+    'travel-packages': TravelPackage;
+    tags: Tag;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -100,6 +102,8 @@ export interface Config {
     services: ServicesSelect<false> | ServicesSelect<true>;
     destinations: DestinationsSelect<false> | DestinationsSelect<true>;
     accommodations: AccommodationsSelect<false> | AccommodationsSelect<true>;
+    'travel-packages': TravelPackagesSelect<false> | TravelPackagesSelect<true>;
+    tags: TagsSelect<false> | TagsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -894,6 +898,8 @@ export interface Destination {
    */
   description?: string | null;
   country: string;
+  departure?: string | null;
+  arrival?: string | null;
   /**
    * Reference "from" price for listing cards only. Real pricing lives in Packages/Cruises.
    */
@@ -1022,6 +1028,145 @@ export interface Accommodation {
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
   generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Administra los paquetes de viajes disponibles y configuraciones para organizar mejor las opciones de viaje dentro del panel administrativo de Destiny Trip.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "travel-packages".
+ */
+export interface TravelPackage {
+  id: string;
+  title: string;
+  description: string;
+  mainImage: string | Media;
+  gallery?: (string | Media)[] | null;
+  highlights?:
+    | {
+        feature: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Destinations included in this package
+   */
+  destinations: (string | Destination)[];
+  /**
+   * Hotels included in this package (optional if flight-only)
+   */
+  accommodations?: (string | Accommodation)[] | null;
+  itinerary?:
+    | {
+        day: number;
+        title: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Additional page content (terms, conditions, extra info)
+   */
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Create a detailed description of at least 300 words.
+   */
+  'long-description': {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Powers an FAQPage schema block for rich snippets in Google
+   */
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  price: number;
+  discountPrice?: number | null;
+  currency: 'VES' | 'USD' | 'EUR';
+  nights: number;
+  days: number;
+  includes?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  excludes?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+  };
+  /**
+   * Active
+   */
+  active?: boolean | null;
+  /**
+   * National / International classification
+   */
+  categories: (string | Category)[];
+  /**
+   * e.g. Honeymoon, Family, Adventure
+   */
+  tags?: (string | Tag)[] | null;
+  publishedAt?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tags".
+ */
+export interface Tag {
+  id: string;
+  name: string;
   slug: string;
   updatedAt: string;
   createdAt: string;
@@ -1248,6 +1393,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'accommodations';
         value: string | Accommodation;
+      } | null)
+    | ({
+        relationTo: 'travel-packages';
+        value: string | TravelPackage;
+      } | null)
+    | ({
+        relationTo: 'tags';
+        value: string | Tag;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1668,6 +1821,8 @@ export interface DestinationsSelect<T extends boolean = true> {
   title?: T;
   description?: T;
   country?: T;
+  departure?: T;
+  arrival?: T;
   priceFrom?: T;
   features?:
     | T
@@ -1726,6 +1881,85 @@ export interface AccommodationsSelect<T extends boolean = true> {
   'expiration-date'?: T;
   publishedAt?: T;
   generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "travel-packages_select".
+ */
+export interface TravelPackagesSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  mainImage?: T;
+  gallery?: T;
+  highlights?:
+    | T
+    | {
+        feature?: T;
+        id?: T;
+      };
+  destinations?: T;
+  accommodations?: T;
+  itinerary?:
+    | T
+    | {
+        day?: T;
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  content?: T;
+  'long-description'?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  price?: T;
+  discountPrice?: T;
+  currency?: T;
+  nights?: T;
+  days?: T;
+  includes?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  excludes?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  active?: T;
+  categories?: T;
+  tags?: T;
+  publishedAt?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tags_select".
+ */
+export interface TagsSelect<T extends boolean = true> {
+  name?: T;
   slug?: T;
   updatedAt?: T;
   createdAt?: T;

@@ -84,8 +84,23 @@ export const Destinations: CollectionConfig = {
               name: 'country',
               type: 'text',
               required: true,
-              label: { en: 'Country', es: 'País' },
+              label: { en: '🌎 Country', es: '🌎 País' },
               admin: { position: 'sidebar' },
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'departure',
+                  type: 'text',
+                  label: { en: '🛫 Departure', es: '🛬 Sale desde' },
+                },
+                {
+                  name: 'arrival',
+                  type: 'text',
+                  label: { en: '🛬 Arrival', es: '🛬 Llega a' },
+                },
+              ],
             },
 
             {

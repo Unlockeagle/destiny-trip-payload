@@ -19,6 +19,8 @@ import { getServerSideURL } from './utilities/getURL'
 import { Services } from './collections/Services'
 import { Destinations } from './collections/Destinations'
 import { Accommodations } from './collections/Accommodations'
+import { TravelPackages } from './collections/TravelPackages'
+import { Tags } from './collections/Tags'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -65,7 +67,18 @@ export default buildConfig({
   db: mongooseAdapter({
     url: process.env.DATABASE_URL || '',
   }),
-  collections: [Pages, Posts, Media, Categories, Users, Services, Destinations, Accommodations],
+  collections: [
+    Pages,
+    Posts,
+    Media,
+    Categories,
+    Users,
+    Services,
+    Destinations,
+    Accommodations,
+    TravelPackages,
+    Tags,
+  ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
   plugins,
