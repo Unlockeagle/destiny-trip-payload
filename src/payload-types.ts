@@ -211,7 +211,7 @@ export interface Page {
       | null;
     media?: (string | null) | Media;
   };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
+  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock | DestinationsBlock)[];
   meta?: {
     title?: string | null;
     /**
@@ -792,6 +792,131 @@ export interface Form {
   createdAt: string;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DestinationsBlock".
+ */
+export interface DestinationsBlock {
+  title: string;
+  subtitle?: string | null;
+  /**
+   * Displays a small label on every card of this block
+   */
+  showCardBadge?: boolean | null;
+  /**
+   * e.g. "Popular", "Featured", "Best seller", "New"
+   */
+  cardBadgeLabel?: string | null;
+  /**
+   * How many destinations will be displayed in this block
+   */
+  limit?: number | null;
+  /**
+   * Only shows destinations matching this type. "All" ignores this filter.
+   */
+  type?: ('all' | 'national' | 'international') | null;
+  /**
+   * Leave empty to auto-pull active destinations by the filters above. Fill it to hand-pick specific destinations instead (overrides "limit" and "type").
+   */
+  destinations?: (string | Destination)[] | null;
+  ctaLabel?: string | null;
+  /**
+   * e.g. /destinos
+   */
+  ctaLink?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'destinations';
+}
+/**
+ * Destinations supported by your agency
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "destinations".
+ */
+export interface Destination {
+  id: string;
+  title: string;
+  /**
+   * Used in listing cards and search results snippets
+   */
+  description?: string | null;
+  country: string;
+  departure?: string | null;
+  arrival?: string | null;
+  /**
+   * Reference "from" price for listing cards only. Real pricing lives in Packages/Cruises.
+   */
+  priceFrom?: number | null;
+  /**
+   * Highlights shown as icons/badges on the destination page (luggage, meals, transfers, etc.)
+   */
+  features?:
+    | {
+        icon: 'luggage' | 'meals' | 'transfers' | 'wifi' | 'insurance' | 'guide' | 'hotel' | 'flight' | 'other';
+        /**
+         * e.g. "2 checked bags 23kg" or "Breakfast included"
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  mainImage?: (string | null) | Media;
+  gallery?: (string | Media)[] | null;
+  /**
+   * Create a detailed description of at least 300 words.
+   */
+  'long-description': {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Powers an FAQPage schema block for rich snippets in Google
+   */
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+  };
+  publishedAt?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * Auto-computed from country
+   */
+  type: 'national' | 'international';
+  /**
+   * Destiny Is Activate?
+   */
+  featured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * Services details
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -880,95 +1005,6 @@ export interface Service {
    */
   generateSlug?: boolean | null;
   slug: string;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * Destinations supported by your agency
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "destinations".
- */
-export interface Destination {
-  id: string;
-  title: string;
-  /**
-   * Used in listing cards and search results snippets
-   */
-  description?: string | null;
-  country: string;
-  departure?: string | null;
-  arrival?: string | null;
-  /**
-   * Reference "from" price for listing cards only. Real pricing lives in Packages/Cruises.
-   */
-  priceFrom?: number | null;
-  /**
-   * Highlights shown as icons/badges on the destination page (luggage, meals, transfers, etc.)
-   */
-  features?:
-    | {
-        icon: 'luggage' | 'meals' | 'transfers' | 'wifi' | 'insurance' | 'guide' | 'hotel' | 'flight' | 'other';
-        /**
-         * e.g. "2 checked bags 23kg" or "Breakfast included"
-         */
-        label: string;
-        id?: string | null;
-      }[]
-    | null;
-  mainImage?: (string | null) | Media;
-  gallery?: (string | Media)[] | null;
-  /**
-   * Create a detailed description of at least 300 words.
-   */
-  'long-description': {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  /**
-   * Powers an FAQPage schema block for rich snippets in Google
-   */
-  faqs?:
-    | {
-        question: string;
-        answer: string;
-        id?: string | null;
-      }[]
-    | null;
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (string | null) | Media;
-  };
-  publishedAt?: string | null;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  /**
-   * Auto-computed from country
-   */
-  type: 'national' | 'international';
-  /**
-   * Destiny Is Activate?
-   */
-  featured?: boolean | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1500,6 +1536,7 @@ export interface PagesSelect<T extends boolean = true> {
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
+        destinations?: T | DestinationsBlockSelect<T>;
       };
   meta?:
     | T
@@ -1596,6 +1633,23 @@ export interface FormBlockSelect<T extends boolean = true> {
   form?: T;
   enableIntro?: T;
   introContent?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DestinationsBlock_select".
+ */
+export interface DestinationsBlockSelect<T extends boolean = true> {
+  title?: T;
+  subtitle?: T;
+  showCardBadge?: T;
+  cardBadgeLabel?: T;
+  limit?: T;
+  type?: T;
+  destinations?: T;
+  ctaLabel?: T;
+  ctaLink?: T;
   id?: T;
   blockName?: T;
 }
