@@ -16,7 +16,12 @@ export const DestinationCard = ({ destination, badgeLabel }: Props) => {
         <div className="destination-card__images h-56 relative overflow-hidden">
           <img
             className="w-full h-full object-cover group-hover:scale-105 transition-transform ease-in-out duration-300"
-            src={destination.mainImage.sizes?.small?.url ?? ''}
+            src={
+              destination.mainImage.sizes?.small?.url ??
+              destination.mainImage.sizes?.medium?.url ??
+              destination.mainImage.url ??
+              ''
+            }
             alt={destination.mainImage.alt ?? ''}
           />
           {/* destination --->>> badge */}
