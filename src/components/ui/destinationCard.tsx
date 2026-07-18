@@ -62,7 +62,8 @@ export const DestinationCard = ({ destination, badgeLabel }: Props) => {
 
         {/* destination --->>> CTA */}
         <Link
-          href={`destinos/${destination.type}/${destination.slug}`}
+          href={`destinos/${destination.slug}`}
+          // href={`destinos/${destination.type}/${destination.slug}`}
           className="mt-4 group bg-pink-600 text-zinc-50 text-center rounded-md px-4 py-2"
         >
           Ver destino{' '}
